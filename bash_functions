@@ -12,6 +12,38 @@
 # Examples
 #   command_exits foo
 #
+#
+git_apply_gpg() {
+  git config commit.gpgsign true
+  git config gpg.program gpg2
+  git config user.signingkey 6EAA52A49653D5CD
+}
+
+update-server-list()
+{
+  echo -n Password:
+  read -s _password
+  local server_list="${HOME}/workspace/servers_list"
+  TOKEN=$(curl -s -X POST -H "Content-Type: application/json" https://ipbase.ipsw.dt.ept.lu/auth --data '{"username" :  "'"${USER}"'", "password" : "'"${_password}"'" }' | jq .access_token -r )
+  echo "New token: ${TOKEN}"
+  curl -s -H "Authorization: Bearer ${TOKEN}" https://ipam-api.dtt.ptech.lu/contexts/global/hosts?cidr=172.27.0.0/24 | jq .[].label -r > ${server_list}
+  echo "Servers list updated in ${server_list}"
+}
+
+_ssh()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts=$(cat ~/workspace/servers_list)
+    COMPREPLY=( $(compgen -W "$opts" -- ${cur}) )
+    return 0
+}
+complete -F _ssh ssh
+
+
+
 # Produces an exit code of 0 if command exists
 command_exists() {
   # shellcheck disable=SC2039
@@ -25,10 +57,18 @@ _ssh_molecule () {
 }
 
 
+update_oa_token(){
+  if [ "$(oc whoami)" != "${USER}" ];then
+    oc login
+  fi
+  export KIND_OA_REGISTRY_USER=${USER}
+  export KIND_OA_REGISTRY_TOKEN=$(oc whoami -t)
+}
+
 update-ssh-socket(){
     SSH_AUTH_SOCK=$(find /tmp/ssh* -uid "$(id -u)" -type s -name agent.\* -printf '%C@ %p\n' 2>/dev/null | sort | tail -n1 |cut -d' ' -f2)
     export SSH_AUTH_SOCK
-    echo "Socket updated to $SSH_AUTH_SOCK"
+    #echo "Socket updated to $SSH_AUTH_SOCK"
 }
 update-ssh-socket
 

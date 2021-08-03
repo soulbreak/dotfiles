@@ -8,6 +8,7 @@ fi
 
 
 alias psc='ps xawf -eo pid,user,cgroup,args'
+alias registriy_ipsw_dockerlogin='docker login --username $(oc whoami) --password $(oc whoami -t) registry.ipsw.dt.ept.lu'
 alias vi="vim"
 alias _reload_profile=". ~/.bashrc"
 alias dotfiles="cd ~/workspace/dotfiles"

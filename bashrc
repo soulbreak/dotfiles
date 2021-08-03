@@ -1,7 +1,8 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
-export PATH=${PATH}:~/workspace/bin:~/.local/bin:/opt/ansible/env/bin:/opt/fabric2/env/bin
+export PATH=${PATH}:~/workspace/bin:~/workspace/stuff/scripts:~/.local/bin:/opt/ansible/env/bin:/opt/fabric2/env/bin:~/workspace/go/bin
+export GOPATH=~/workspace/go
 export LANG=en_US.utf8
 export HISTCONTROL=ignoredups:ignorespace      # don't put duplicated to history
 export HISTSIZE=10000                          # History size length
@@ -18,6 +19,8 @@ EDITOR_CMD=vim
 export XDG_CONFIG_HOME=$HOME/.config
 export EDITOR=$EDITOR_CMD
 export VISUAL=$EDITOR_CMD
+# Gpg signature
+export GPG_TTY=$(tty)
 
 export ANSIBLE_HOME=/home/users/dmaas/workspace/ansible
 export ANSIBLE_CONFIG=/home/users/dmaas/workspace/ansible/ansible.cfg
@@ -92,8 +95,8 @@ if [ -f ~/.bash_functions ]; then
     . ~/.bash_functions
 fi
 
-if [ -f ~/.p/load.sh ]; then
-    . ~/.p/load.sh
+if [ -f ~/workspace/.p/load.sh ]; then
+    . ~/workspace/.p/load.sh
 fi
 
 
@@ -114,8 +117,11 @@ fi
 
 unset color_prompt force_color_prompt
 
-export PATH="/opt/pyenv/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
+#if [ -d "/opt/pyenv/bin" ];then
+#  export PATH="/opt/pyenv/bin:$PATH"
+#  eval "$(pyenv init -)"
+#  eval "$(pyenv virtualenv-init -)"
+#fi
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+source <(kubectl completion bash)
